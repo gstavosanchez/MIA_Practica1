@@ -8,3 +8,4 @@ pool.getConnection()
         pool.releaseConnection(connection);
         console.log('DB is connect');
     });
+export default pool;
