@@ -18,12 +18,12 @@ export const loadFiles = async (
   const filePath: string = req.body.filePath;
   const data = await fs.readFile(filePath, "utf-8");
   let splitData: string[] = data.split("\r\n");
-
-  splitData.forEach((value, index) => {
-    if (index > 0) {
+  let index:number = 0;
+  for (let value of splitData ) {
+    if (index > 0 && value != '' && value != null) {
       const recordSplit:string[] = value.split(";");
       const newTemp: ITemp = {
-        temporalID: 0,
+        temporalID: index,
         /* =========== DATOS DE ENFERMO =========== */
         nombre_victima:recordSplit[0],
         apellido_victima:recordSplit[1],
@@ -54,8 +54,16 @@ export const loadFiles = async (
         efectividad_tratamiento_victima:recordSplit[22] != '\r' ? recordSplit[22]:''
       };
       console.log(newTemp);
+      const resutl = await pool.query('CALL sp_insert_temp (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',[
+        newTemp.nombre_victima,newTemp.apellido_victima,newTemp.direccion_victima,newTemp.fecha_sospecha,newTemp.fecha_confirmacion,newTemp.fecha_muerte,newTemp.estado_victima,
+        newTemp.nombre_asociado,newTemp.apellido_asociado,newTemp.fecha_conocio,newTemp.tipo_contacto,newTemp.fecha_inicio_contacto,newTemp.fecha_fin_contacto,
+        newTemp.nombre_hospital,newTemp.ubicacion_hospital,
+        newTemp.ubicacion_victima,newTemp.fecha_llegada,newTemp.fecha_retiro,
+        newTemp.nombre_tratamiento,newTemp.efectividad_tratamietno,newTemp.fecha_incio_tratamiento,newTemp.fecha_fin_tratamiento,newTemp.efectividad_tratamiento_victima
+      ]);
     }
-  });
+    index++;
+  }
 
   return res.status(200).json({ msg:'The file loaded successfully' });
 };
@@ -67,4 +75,11 @@ export const loadFiles = async (
  * @para res: Response de la peticio
  * @returns: Devuelve un json con el resultado de la peticion
  */
-export const getDatos = (req: Request, res: Response) => {};
+export const getDatos = async (req: Request, res: Response):Promise<Response> => {
+  const hospital = {
+    '_nombre':'Roosvelth',
+    '_ubicacion':'Zona 11,Ciudad de Guatemala'
+  }
+  const result = await pool.query('CALL sp_insert_hospital (?,?)',[hospital._nombre,hospital._ubicacion]);
+  return res.status(200).json({ msg:'Succefully ' });
+};

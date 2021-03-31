@@ -2,7 +2,7 @@
 -- ------ NEW DATABASE -----
 CREATE DATABASE gveDB;
 USE gveDB;
-
+-- DROP DATABASE gveDB;
 -- ------ TABLE TEMPORAL -----
 CREATE TABLE Temporal(
     temporalID INT NOT NULL AUTO_INCREMENT,
@@ -115,4 +115,3 @@ CREATE TABLE LugarContagio(
     PRIMARY KEY(lugarId),
     FOREIGN KEY(enfermoID) REFERENCES Enfermo(enfermoID)
 );
-
