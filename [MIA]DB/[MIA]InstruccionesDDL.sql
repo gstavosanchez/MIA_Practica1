@@ -81,7 +81,8 @@ CREATE TABLE TratamientoEnfermo(
     hospitalID INT NOT NULL,
     PRIMARY KEY(tratamientoEnfermoID),
     FOREIGN KEY(tratamientoID) REFERENCES Tratamiento(tratamientoID),
-    FOREIGN KEY(enfermoID) REFERENCES Enfermo(enfermoID)
+    FOREIGN KEY(enfermoID) REFERENCES Enfermo(enfermoID),
+    FOREIGN KEY(hospitalID) REFERENCES Hospital(hospitalID)
 );
 -- ------ TABLE DETALLE ASOCIADO -----
 CREATE TABLE DetalleAsociado(
@@ -113,5 +114,14 @@ CREATE TABLE LugarContagio(
     fechaSalida DATETIME NOT NULL,
     enfermoID INT NOT NULL,
     PRIMARY KEY(lugarId),
+    FOREIGN KEY(enfermoID) REFERENCES Enfermo(enfermoID)
+);
+-- ------ TABLE HOSPITALIZACION -----
+CREATE TABLE Hospitalizacion(
+    hospitalizacionID INT NOT NULL AUTO_INCREMENT,
+    hospitalID INT NOT NULL,
+    enfermoID INT NOT NULL,
+    PRIMARY KEY(hospitalizacionID),
+    FOREIGN KEY(hospitalID) REFERENCES Hospital(hospitalID),
     FOREIGN KEY(enfermoID) REFERENCES Enfermo(enfermoID)
 );
