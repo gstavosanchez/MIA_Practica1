@@ -114,7 +114,7 @@ CREATE PROCEDURE sp_lugar_contacto(
     BEGIN
         DECLARE _enfermoID INT DEFAULT 0;
         DECLARE searchID INT DEFAULT 0;
-        IF (_nombre_victima != '') THEN
+        IF (_nombre_victima != '' AND _ubicacion != '') THEN
             SET _enfermoID = (SELECT enfermoID FROM Enfermo WHERE nombre LIKE CONCAT('%',_nombre_victima,'%') AND 
                                 apellido LIKE CONCAT('%',_apellido_victima,'%') AND direccion LIKE CONCAT('%',_direccion_victima,'%'));
             SET searchID = (SELECT lugarId FROM LugarContagio WHERE ubicacion LIKE CONCAT('%',_ubicacion,'%')
