@@ -126,3 +126,24 @@ AS
 /*  Mostrar el número de mes ,de la fecha de la primera sospecha, nombre y
     apellido de las víctimas que más tratamientos se han aplicado y las que
     menos. (Todo en una sola consulta). */
+CREATE VIEW view_consulta8
+AS
+    SELECT en.nombre AS Nombre, en.apellido AS Apellido,(MONTH(en.fechaSospecha)) 'Mes_Sospecha',
+    (SELECT COUNT(enfermoID) FROM TratamientoEnfermo WHERE enfermoID = ten.enfermoID) 'No_tratamientos'
+    FROM Enfermo AS en
+    INNER JOIN TratamientoEnfermo AS ten ON ten.enfermoID = en.enfermoID
+    GROUP BY ten.enfermoID
+    ORDER BY (SELECT COUNT(enfermoID) FROM TratamientoEnfermo WHERE enfermoID = ten.enfermoID) DESC
+;
+/*  ====== ======================== CONSULTA NO.9 ======================== ======*/
+/*  Mostrar el porcentaje de víctimas que le corresponden a cada hospital. */
+CREATE VIEW view_consulta9
+AS
+    SELECT hp.nombre,(SELECT COUNT(enfermoID) FROM Hospitalizacion WHERE hospitalID = hz.hospitalID) 'Cantidad',
+    (CONCAT(ROUND(
+        ((SELECT COUNT(enfermoID) FROM Hospitalizacion WHERE hospitalID = hz.hospitalID)/(SELECT COUNT(enfermoID) FROM Hospitalizacion)) * 100,
+        1),' %')) 'Porcentaje'
+    FROM Hospital AS hp
+    INNER JOIN Hospitalizacion AS hz ON hz.hospitalID = hp.hospitalID
+    GROUP BY hz.hospitalID;
+;
