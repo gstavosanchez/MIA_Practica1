@@ -7,7 +7,7 @@ SELECT * FROM Tratamiento;
 SELECT * FROM TratamientoEnfermo;
 SELECT * FROM Asociado;
 SELECT * FROM DetalleAsociado;
-SELECT * FROM ContactoContagio;
+SELECT * FROM ContactoContagio where enfermoID = 5;
 SELECT * FROM LugarContagio;
 /* ====== ELIMINAR ===== */
 DROP VIEW view_consulta1;
@@ -49,11 +49,12 @@ AS
 CREATE VIEW view_consulta3
 AS
     SELECT en.nombre AS Nombre,en.apellido AS Apellido, en.direccion AS Direccion,
-    (SELECT COUNT(asociadoID) FROM ContactoContagio WHERE enfermoID = cc.enfermoID) 'No_Asociados'
+    (SELECT COUNT(asociadoID) FROM DetalleAsociado WHERE enfermoID = cc.enfermoID) 'No_Asociados'
     FROM Enfermo AS en
-    INNER JOIN ContactoContagio AS cc ON cc.enfermoID = en.enfermoID
+    INNER JOIN DetalleAsociado AS cc ON cc.enfermoID = en.enfermoID
     INNER JOIN Asociado AS a ON a.asociadoID = cc.asociadoID
-    WHERE (SELECT COUNT(asociadoID) FROM ContactoContagio WHERE enfermoID = cc.enfermoID) > 3
+    WHERE (SELECT COUNT(asociadoID) FROM DetalleAsociado WHERE enfermoID = cc.enfermoID) > 3
+    AND en.fechaMuerte > '0000-00-00 00:00:00'
     GROUP BY cc.enfermoID
 ;
 /*  ====== ======================== CONSULTA NO.4 ======================== ======*/
@@ -139,7 +140,7 @@ AS
 /*  Mostrar el porcentaje de víctimas que le corresponden a cada hospital. */
 CREATE VIEW view_consulta9
 AS
-    SELECT hp.nombre,(SELECT COUNT(enfermoID) FROM Hospitalizacion WHERE hospitalID = hz.hospitalID) 'Cantidad',
+    SELECT hp.nombre AS Hospital,(SELECT COUNT(enfermoID) FROM Hospitalizacion WHERE hospitalID = hz.hospitalID) 'Cantidad',
     (CONCAT(ROUND(
         ((SELECT COUNT(enfermoID) FROM Hospitalizacion WHERE hospitalID = hz.hospitalID)/(SELECT COUNT(enfermoID) FROM Hospitalizacion)) * 100,
         1),' %')) 'Porcentaje'
@@ -147,3 +148,62 @@ AS
     INNER JOIN Hospitalizacion AS hz ON hz.hospitalID = hp.hospitalID
     GROUP BY hz.hospitalID;
 ;
+/*  ====== ======================== CONSULTA NO.10 ======================== ======*/
+/*  Mostrar el porcentaje del contacto físico más común de cada hospital de la
+    siguiente manera: nombre de hospital, nombre del contacto físico, porcentaje
+    de víctimas. */
+CREATE VIEW view_consulta10
+AS
+    SELECT hp.nombre AS Hospital,cc.tipo AS Tipo_Contacto,
+    (ROUND(((SELECT COUNT(cc1.tipo)
+                FROM Hospitalizacion as hz1
+                inner join enfermo as en1 on en1.enfermoID = hz1.enfermoID
+                inner join contactocontagio as cc1 on cc1.enfermoID = hz1.enfermoID
+                WHERE hz1.hospitalID = hz.hospitalID
+                and cc1.tipo = cc.tipo )/
+            (SELECT COUNT(cc2.tipo)
+                FROM Hospitalizacion as hz2
+                inner join enfermo as en2 on en2.enfermoID = hz2.enfermoID
+                inner join contactocontagio as cc2 on cc2.enfermoID = hz2.enfermoID
+                WHERE hz2.hospitalID = hz.hospitalID ))*100,2)) 'Porcentaje'
+    FROM Hospital AS hp
+    INNER JOIN Hospitalizacion AS hz ON hz.hospitalID = hp.hospitalID
+    INNER JOIN Enfermo AS en ON en.enfermoID = hz.enfermoID
+    INNER JOIN ContactoContagio AS cc ON cc.enfermoID = hz.enfermoID
+    GROUP BY hp.hospitalID,cc.tipo
+;
+
+
+
+
+/*  ====== ======================== EXTRA ======================== ======*/
+
+SELECT hp.hospitalID,hp.nombre AS Hospital,en.enfermoID,en.nombre AS Enfermo, cc.tipo AS Tipo_Contacto
+FROM Hospital AS hp
+INNER JOIN Hospitalizacion AS hz ON hz.hospitalID = hp.hospitalID
+INNER JOIN Enfermo AS en ON en.enfermoID = hz.enfermoID
+INNER JOIN ContactoContagio AS cc ON cc.enfermoID = hz.enfermoID
+ORDER BY hp.hospitalID
+
+
+SELECT COUNT(tipo) FROM ContactoContagio WHERE enfermoID = 6
+SELECT COUNT(hospitalID) FROM Hospitalizacion WHERE hospitalID = 2
+
+
+SELECT COUNT(tipo) FROM ContactoContagio WHERE enfermoID = 59     
+SELECT COUNT(cc2.tipo)
+FROM Hospitalizacion as hz2
+inner join enfermo as en2 on en2.enfermoID = hz2.enfermoID
+inner join contactocontagio as cc2 on cc2.enfermoID = hz2.enfermoID
+WHERE hz2.hospitalID = 2
+
+SELECT cc0.tipo
+FROM Hospitalizacion as hz0
+inner join enfermo as en0 on en0.enfermoID = hz0.enfermoID
+inner join contactocontagio as cc0 on cc0.enfermoID = hz0.enfermoID
+WHERE hz0.hospitalID = 15
+GROUP BY cc0.tipo 
+ORDER BY (count(cc1.tipo) ) desc
+LIMIT 1
+
+

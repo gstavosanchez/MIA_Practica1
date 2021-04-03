@@ -114,7 +114,7 @@ CREATE PROCEDURE sp_lugar_contacto(
     BEGIN
         DECLARE _enfermoID INT DEFAULT 0;
         DECLARE searchID INT DEFAULT 0;
-        IF (_nombre_victima != '' AND _ubicacion != '') THEN
+        IF (_nombre_victima != '' AND _ubicacion != '' AND _fecha_llegada != '' AND _fecha_retiro != '') THEN
             SET _enfermoID = (SELECT enfermoID FROM Enfermo WHERE nombre LIKE CONCAT('%',_nombre_victima,'%') AND 
                                 apellido LIKE CONCAT('%',_apellido_victima,'%') AND direccion LIKE CONCAT('%',_direccion_victima,'%'));
             SET searchID = (SELECT lugarId FROM LugarContagio WHERE ubicacion LIKE CONCAT('%',_ubicacion,'%')
@@ -162,7 +162,7 @@ CREATE PROCEDURE sp_insert_detalle_asociado(
         DECLARE _enfermoID INT DEFAULT 0;
         DECLARE _asociadoID INT DEFAULT 0;
         DECLARE searchID INT DEFAULT 0;
-        IF (_nombre_victima != '' AND _nombre_asociado != '') THEN
+        IF (_nombre_victima != '' AND _nombre_asociado != '' AND _fecha_conocio != '') THEN
             SET _enfermoID = (SELECT enfermoID FROM Enfermo WHERE nombre LIKE CONCAT('%',_nombre_victima,'%') AND 
                                 apellido LIKE CONCAT('%',_apellido_victima,'%') AND direccion LIKE CONCAT('%',_direccion_victima,'%'));
             SET _asociadoID = (SELECT asociadoID FROM Asociado WHERE nombre
@@ -194,7 +194,8 @@ CREATE PROCEDURE sp_insert_contacto_contagio(
         DECLARE _enfermoID INT DEFAULT 0;
         DECLARE _asociadoID INT DEFAULT 0;
         DECLARE searchID INT DEFAULT 0;
-        IF (_nombre_victima != '' AND _nombre_asociado != '') THEN
+        IF (_nombre_victima != '' AND _nombre_asociado != '' AND _fecha_contacto != '' AND _fecha_fin_contacto != ''
+            AND _tipo != '') THEN
             SET _enfermoID = (SELECT enfermoID FROM Enfermo WHERE nombre LIKE CONCAT('%',_nombre_victima,'%') AND 
                             apellido LIKE CONCAT('%',_apellido_victima,'%') AND direccion LIKE CONCAT('%',_direccion_victima,'%'));
             SET _asociadoID = (SELECT asociadoID FROM Asociado WHERE nombre
