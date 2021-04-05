@@ -13,6 +13,8 @@ router.get('/consulta8',hospitalCtrl.getQuery8);
 router.get('/consulta9',hospitalCtrl.getQuery9);
 router.get('/consulta10',hospitalCtrl.getQuery10);
 router.post('/cargartemporal',hospitalCtrl.loadFiles);
-router.post('/cargartemporal',hospitalCtrl.loadFiles);
+router.post('/cargarmodelo',hospitalCtrl.loadModel);
+router.post('/eliminartemporal',hospitalCtrl.deleteTemp);
+router.post('/eliminarmodelo',hospitalCtrl.deleteModel);
 
 export default router;

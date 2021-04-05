@@ -186,8 +186,41 @@ export const getQuery6 = async (req:Request,res:Response):Promise<Response> => {
  * @param res: Response de la peticio
  * @returns: Devuelve un json con el resultado de la peticion
  */
- export const getQuery10 = async (req:Request,res:Response):Promise<Response> => {
+export const getQuery10 = async (req:Request,res:Response):Promise<Response> => {
   const result:any[] = await pool.query('SELECT * FROM view_consulta10');
   if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
   return res.status(200).json({consulta3:result})
+}
+/* ================================== GET ELIMINAR TEMPORAL ================================== */
+/**
+ * Eliminar datos de la tabla temporal
+ * @param req Requst de la peticion
+ * @param res Response de la peticion
+ * @returns Devuelve un json con el resultado de la petición
+ */
+export const deleteTemp = async (req:Request,res:Response):Promise<Response> => {
+  const result:any[] = await pool.query('d');
+  return res.status(200).json({msg:'Data deleted from temprary table'})
+}
+/* ================================== GET ELIMINAR MODELO ================================== */
+/**
+ * Elimina las tablas del modelo de datos
+ * @param req Requst de la peticion
+ * @param res Response de la peticion
+ * @returns Devuelve un json con el resultado de la petición
+ */
+export const deleteModel = async (req:Request,res:Response):Promise<Response> => {
+  const result:any[] = await pool.query('d');
+  return res.status(200).json({msg:'Data deleted from temprary table'})
+}
+/* ================================== GET CARGA EL MODELO ================================== */
+/**
+ * Crear tablas del modelo y las vistas
+ * @param req Requst de la peticion
+ * @param res Response de la peticion
+ * @returns Devuelve un json con el resultado de la petición
+ */
+ export const loadModel = async (req:Request,res:Response):Promise<Response> => {
+  const result:any[] = await pool.query('d');
+  return res.status(200).json({msg:'Data deleted from temprary table'})
 }
