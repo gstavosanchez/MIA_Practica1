@@ -1,7 +1,7 @@
 ###
 GET http://localhost:5000/api/hospital
 ###
-POST http://localhost:5000/api/hospital/loadfile
+POST http://localhost:5000/api/hospital/cargartemporal
 Content-Type: application/json
 
 {

@@ -68,18 +68,126 @@ export const loadFiles = async (
   return res.status(200).json({ msg:'The file loaded successfully' });
 };
 
-/* ================================== GET DATOS ================================== */
+/* ================================== GET CONSULTA NO.1 ================================== */
 /**
- * Metetodo encargado de devolver todos los datos de la consulta
+ * Metetodo encargado de devolver todos los datos de la consulta No.1
+ * @param req: Request de la peticion
+ * @param res: Response de la peticio
+ * @returns: Devuelve un json con el resultado de la peticion
+ */
+export const getQuery1 = async (req: Request, res: Response):Promise<Response> => {
+  const result:any[] = await pool.query('SELECT * FROM view_consulta1');
+  if (result.length == 0) return res.status(404).json({msg: `There is't data in the query`})
+
+  return res.status(200).json({ consulta1:result});
+};
+
+/* ================================== GET CONSULTA NO.2 ================================== */
+/**
+ * Metetodo encargado de devolver todos los datos de la consulta No.2
  * @param req: Request de la peticion
  * @para res: Response de la peticio
  * @returns: Devuelve un json con el resultado de la peticion
  */
-export const getDatos = async (req: Request, res: Response):Promise<Response> => {
-  const hospital = {
-    '_nombre':'Roosvelth',
-    '_ubicacion':'Zona 11,Ciudad de Guatemala'
-  }
-  const result = await pool.query('CALL sp_insert_hospital (?,?)',[hospital._nombre,hospital._ubicacion]);
-  return res.status(200).json({ msg:'Succefully ' });
-};
+export const getQuery2 = async (req:Request,res:Response):Promise<Response> => {
+  const result:any[] = await pool.query('SELECT * FROM view_consulta2');
+  if(result.length == 0) return res.status(404).json({msg:`There isn't data in the query`});
+  
+  return res.status(200).json({consulta2:result});
+}
+/* ================================== GET CONSULTA NO.3 ================================== */
+/**
+ * Metetodo encargado de devolver todos los datos de la consulta No.3
+ * @param req: Request de la peticion
+ * @param res: Response de la peticio
+ * @returns: Devuelve un json con el resultado de la peticion
+ */
+export const getQuery3 = async (req:Request,res:Response):Promise<Response> => {
+  const result:any[] = await pool.query('SELECT * FROM view_consulta3');
+  if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
+  return res.status(200).json({consulta3:result})
+}
+/* ================================== GET CONSULTA NO.4 ================================== */
+/**
+ * Metetodo encargado de devolver todos los datos de la consulta No.4
+ * @param req: Request de la peticion
+ * @param res: Response de la peticio
+ * @returns: Devuelve un json con el resultado de la peticion
+ */
+export const getQuery4 = async(req:Request,res:Response):Promise<Response> => {
+  const result:any[] = await pool.query('SELECT * FROM view_consulta4');
+  if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
+  return res.status(200).json({consulta3:result})
+}
+/* ================================== GET CONSULTA NO.5 ================================== */
+/**
+ * Metetodo encargado de devolver todos los datos de la consulta No.5
+ * @param req: Request de la peticion
+ * @param res: Response de la peticio
+ * @returns: Devuelve un json con el resultado de la peticion
+ */
+export const getQuery5 = async (req:Request,res:Response):Promise<Response> => {
+  const result:any[] = await pool.query('SELECT * FROM view_consulta5');
+  if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
+  return res.status(200).json({consulta3:result})
+}
+/* ================================== GET CONSULTA NO.6 ================================== */
+/**
+ * Metetodo encargado de devolver todos los datos de la consulta No.5
+ * @param req: Request de la peticion
+ * @param res: Response de la peticio
+ * @returns: Devuelve un json con el resultado de la peticion
+ */
+export const getQuery6 = async (req:Request,res:Response):Promise<Response> => {
+  const result:any[] = await pool.query('SELECT * FROM view_consulta6');
+  if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
+  return res.status(200).json({consulta3:result})
+}
+/* ================================== GET CONSULTA NO.7 ================================== */
+/**
+ * Metetodo encargado de devolver todos los datos de la consulta No.5
+ * @param req: Request de la peticion
+ * @param res: Response de la peticio
+ * @returns: Devuelve un json con el resultado de la peticion
+ */
+ export const getQuery7 = async (req:Request,res:Response):Promise<Response> => {
+  const result:any[] = await pool.query('SELECT * FROM view_consulta7');
+  if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
+  return res.status(200).json({consulta3:result})
+}
+/* ================================== GET CONSULTA NO.8 ================================== */
+/**
+ * Metetodo encargado de devolver todos los datos de la consulta No.5
+ * @param req: Request de la peticion
+ * @param res: Response de la peticio
+ * @returns: Devuelve un json con el resultado de la peticion
+ */
+ export const getQuery8 = async (req:Request,res:Response):Promise<Response> => {
+  const result:any[] = await pool.query('SELECT * FROM view_consulta8');
+  if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
+  return res.status(200).json({consulta3:result})
+}
+/* ================================== GET CONSULTA NO.9 ================================== */
+/**
+ * Metetodo encargado de devolver todos los datos de la consulta No.5
+ * @param req: Request de la peticion
+ * @param res: Response de la peticio
+ * @returns: Devuelve un json con el resultado de la peticion
+ */
+ export const getQuery9 = async (req:Request,res:Response):Promise<Response> => {
+  const result:any[] = await pool.query('SELECT * FROM view_consulta9');
+  if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
+  return res.status(200).json({consulta3:result})
+}
+/* ================================== GET CONSULTA NO.10 ================================== */
+/**
+ * Metetodo encargado de devolver todos los datos de la consulta No.5
+ * @param req: Request de la peticion
+ * @param res: Response de la peticio
+ * @returns: Devuelve un json con el resultado de la peticion
+ */
+ export const getQuery10 = async (req:Request,res:Response):Promise<Response> => {
+  const result:any[] = await pool.query('SELECT * FROM view_consulta10');
+  if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
+  return res.status(200).json({consulta3:result})
+}

@@ -23,11 +23,20 @@ SELECT * FROM view_consulta3;
 CREATE VIEW view_consulta1
 AS
     SELECT hp.nombre AS Hospital, hp.direccion AS Direccion,
-    (SELECT COUNT(enfermoID) FROM Enfermo WHERE fechaMuerte > '0000-00-00 00:00:00' AND enfermoID = hz.enfermoID) 'NoMuertos'
+    (SELECT COUNT(hz0.enfermoID) FROM Hospitalizacion AS hz0
+        INNER JOIN Enfermo AS en0 ON en0.enfermoID = hz0.enfermoID
+        WHERE hz0.hospitalID = hz.hospitalID
+        AND en0.fechaMuerte > '0000-00-00 00:00:00'
+	) 'NoMuertos'
     FROM Hospital AS hp
     INNER JOIN Hospitalizacion AS hz ON hz.hospitalID = hp.hospitalID
     INNER JOIN Enfermo AS en ON en.enfermoID = hz.enfermoID
-    WHERE (SELECT COUNT(enfermoID) FROM Enfermo WHERE fechaMuerte > '0000-00-00 00:00:00' AND enfermoID = hz.enfermoID) > 0
+    WHERE (SELECT COUNT(hz0.enfermoID) FROM Hospitalizacion AS hz0
+            INNER JOIN Enfermo AS en0 ON en0.enfermoID = hz0.enfermoID
+            WHERE hz0.hospitalID = hz.hospitalID
+            AND en0.fechaMuerte > '0000-00-00 00:00:00'
+        ) > 0
+    AND en.fechaMuerte > '0000-00-00 00:00:00'
     GROUP BY hp.nombre
 ;
 /*  ====== ======================== CONSULTA NO.2 ======================== ======*/
@@ -40,8 +49,9 @@ AS
     FROM Enfermo AS en
     INNER JOIN TratamientoEnfermo AS ten ON ten.enfermoID = en.enfermoID
     INNER JOIN Tratamiento AS t ON t.tratamientoID = ten.tratamientoID
-    WHERE t.nombre = 'Transfusiones de sangre' AND
-    ten.efectividad > 5
+    WHERE t.nombre = 'Transfusiones de sangre'
+    AND en.estado LIKE '%En cuarentena%'
+    AND ten.efectividad > 5
 ;
 /*  ====== ======================== CONSULTA NO.3 ======================== ======*/
 /* Mostrar el nombre, apellido y dirección de las víctimas fallecidas con más de
@@ -63,49 +73,58 @@ AS
 CREATE VIEW view_consulta4
 AS
     SELECT en.nombre AS Nombre,en.apellido AS Apellido,en.estado AS Estado,cc.tipo AS Tipo_Contacto,
-    (SELECT COUNT(asociadoID) FROM ContactoContagio WHERE enfermoID = cc.enfermoID) 'No_Asociados'
+    (SELECT COUNT(asociadoID) FROM ContactoContagio
+		WHERE enfermoID = cc.enfermoID
+        AND tipo LIKE '%Beso%'
+	) 'No_Asociados'
     FROM Enfermo AS en
     INNER JOIN ContactoContagio AS cc ON cc.enfermoID = en.enfermoID
     INNER JOIN Asociado AS a ON a.asociadoID = cc.asociadoID
     WHERE en.estado LIKE '%Sospecha%' AND
     cc.tipo LIKE '%Beso%'
-    AND (SELECT COUNT(asociadoID) FROM ContactoContagio WHERE enfermoID = cc.enfermoID) > 2
+    AND (SELECT COUNT(asociadoID) FROM ContactoContagio 
+			WHERE enfermoID = cc.enfermoID
+            AND tipo LIKE '%Beso%'
+        ) > 2
     GROUP BY cc.enfermoID
 ;
 /*  ====== ======================== CONSULTA NO.5 ======================== ======*/
 /* Top 5 de víctimas que más tratamientos se han aplicado del tratamiento
-    “Oxígeno”. */
+    “Oxígeno”.
+    NOTA: Depende de como se ordeno aparecen los datos para la calificacion*/
 CREATE VIEW view_consulta5
 AS
     SELECT en.nombre AS Nombre,en.apellido AS Apellido,
-    (SELECT COUNT(enfermoID) FROM TratamientoEnfermo WHERE enfermoID = ten.enfermoID 
-    AND tratamientoID = (SELECT tratamientoID FROM Tratamiento WHERE nombre LIKE'%Oxigeno%')) 'NO_Tratamientos'
+    (SELECT COUNT(enfermoID) FROM TratamientoEnfermo 
+        WHERE enfermoID = ten.enfermoID 
+        AND tratamientoID = (SELECT tratamientoID FROM Tratamiento 
+        WHERE nombre LIKE'%Oxigeno%')
+    ) 'NO_Tratamientos'
     FROM Enfermo AS en
     INNER JOIN TratamientoEnfermo AS ten ON ten.enfermoID = en.enfermoID
     INNER JOIN Tratamiento AS t ON t.tratamientoID = ten.tratamientoID
     WHERE t.nombre LIKE '%Oxigeno%'
     GROUP BY ten.enfermoID
     ORDER BY (SELECT COUNT(enfermoID) FROM TratamientoEnfermo WHERE enfermoID = ten.enfermoID 
-    AND tratamientoID = (SELECT tratamientoID FROM Tratamiento WHERE nombre LIKE'%Oxigeno%')) DESC
+                AND tratamientoID = (SELECT tratamientoID FROM Tratamiento 
+                WHERE nombre LIKE'%Oxigeno%')
+            ),en.nombre ASC
     LIMIT 5
 ;
 /*  ====== ======================== CONSULTA NO.6 ======================== ======*/
 /*  Mostrar el nombre, el apellido y la fecha de fallecimiento de todas las
     víctimas que se movieron por la dirección “1987 Delphine Well” a los cuales
-    se les aplicó "Manejo de la presión arterial" como tratamiento.
-    Esa direccion solo existe para la ubiacion del hospital*/
+    se les aplicó "Manejo de la presión arterial" como tratamiento.*/
 CREATE VIEW view_consulta6
 AS
     SELECT en.nombre AS Nombre, en.apellido AS Apellido, en.fechaMuerte AS Fecha_Muerte,
-    h.direccion AS Direccion_hospital, t.nombre AS Tratamiento
+    lc.ubicacion AS Ubicacion_victima, t.nombre AS Tratamiento
     FROM Enfermo AS en
     INNER JOIN TratamientoEnfermo AS ten ON ten.enfermoID = en.enfermoID
-    INNER JOIN HOSPITAL AS h ON h.hospitalID = ten.hospitalID
+    INNER JOIN LugarContagio AS lc ON lc.enfermoID = ten.enfermoID
     INNER JOIN Tratamiento AS t ON t.tratamientoID = ten.tratamientoID
-    WHERE en.fechaMuerte > '0000-00-00 00:00:00'
     AND t.nombre LIKE '%Manejo de la presion arterial%'
-    AND h.direccion LIKE '%1987 Delphine Well%'
-    GROUP BY h.direccion
+    AND lc.ubicacion LIKE '%1987 Delphine Well%'
 ;
 /*  ====== ======================== CONSULTA NO.7 ======================== ======*/
 /* Mostrar nombre, apellido y dirección de las víctimas que tienen menos de 2
@@ -129,12 +148,24 @@ AS
     menos. (Todo en una sola consulta). */
 CREATE VIEW view_consulta8
 AS
-    SELECT en.nombre AS Nombre, en.apellido AS Apellido,(MONTH(en.fechaSospecha)) 'Mes_Sospecha',
-    (SELECT COUNT(enfermoID) FROM TratamientoEnfermo WHERE enfermoID = ten.enfermoID) 'No_tratamientos'
-    FROM Enfermo AS en
-    INNER JOIN TratamientoEnfermo AS ten ON ten.enfermoID = en.enfermoID
-    GROUP BY ten.enfermoID
-    ORDER BY (SELECT COUNT(enfermoID) FROM TratamientoEnfermo WHERE enfermoID = ten.enfermoID) DESC
+    SELECT * FROM (
+        SELECT en.nombre AS Nombre, en.apellido AS Apellido,(MONTH(en.fechaSospecha)) 'Mes_Sospecha',
+        (SELECT COUNT(enfermoID) FROM TratamientoEnfermo WHERE enfermoID = ten.enfermoID ) No_tratamientos
+        FROM Enfermo AS en
+        INNER JOIN TratamientoEnfermo AS ten ON ten.enfermoID = en.enfermoID
+        GROUP BY ten.enfermoID
+        ORDER BY (No_tratamientos) DESC 
+        LIMIT 5
+    )A UNION
+    SELECT * FROM (
+        SELECT en.nombre AS Nombre, en.apellido AS Apellido,(MONTH(en.fechaSospecha)) 'Mes_Sospecha',
+        (SELECT COUNT(enfermoID) FROM TratamientoEnfermo WHERE enfermoID = ten.enfermoID ) No_tratamientos
+        FROM Enfermo AS en
+        INNER JOIN TratamientoEnfermo AS ten ON ten.enfermoID = en.enfermoID
+        GROUP BY ten.enfermoID
+        ORDER BY (No_tratamientos) ASC 
+        LIMIT 5
+    )B
 ;
 /*  ====== ======================== CONSULTA NO.9 ======================== ======*/
 /*  Mostrar el porcentaje de víctimas que le corresponden a cada hospital. */
@@ -146,7 +177,8 @@ AS
         1),' %')) 'Porcentaje'
     FROM Hospital AS hp
     INNER JOIN Hospitalizacion AS hz ON hz.hospitalID = hp.hospitalID
-    GROUP BY hz.hospitalID;
+    GROUP BY hz.hospitalID
+    ORDER BY hp.nombre
 ;
 /*  ====== ======================== CONSULTA NO.10 ======================== ======*/
 /*  Mostrar el porcentaje del contacto físico más común de cada hospital de la
