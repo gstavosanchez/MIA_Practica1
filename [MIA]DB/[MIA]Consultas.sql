@@ -190,22 +190,22 @@ AS
         SELECT hp.nombre AS Hospital,cc.tipo AS Tipo_Contacto,
         (
             SELECT COUNT(cc1.tipo) FROM Hospitalizacion AS hz1
-                INNER JOIN enfermo AS en1 on en1.enfermoID = hz1.enfermoID
-                INNER JOIN contactocontagio AS cc1 on cc1.enfermoID = hz1.enfermoID
+                INNER JOIN Enfermo AS en1 on en1.enfermoID = hz1.enfermoID
+                INNER JOIN ContactoContagio AS cc1 on cc1.enfermoID = hz1.enfermoID
                 WHERE hz1.hospitalID = hz.hospitalID
                 and cc1.tipo = cc.tipo
         )Cantidad,
         (CONCAT(
                 ROUND((
                         (SELECT COUNT(cc1.tipo) FROM Hospitalizacion AS hz1
-                            INNER JOIN enfermo AS en1 on en1.enfermoID = hz1.enfermoID
-                            INNER JOIN contactocontagio AS cc1 on cc1.enfermoID = hz1.enfermoID
+                            INNER JOIN Enfermo AS en1 on en1.enfermoID = hz1.enfermoID
+                            INNER JOIN ContactoContagio AS cc1 on cc1.enfermoID = hz1.enfermoID
                             WHERE hz1.hospitalID = hz.hospitalID
                             and cc1.tipo = cc.tipo 
                         )/
                         (SELECT COUNT(cc2.tipo) FROM Hospitalizacion AS hz2
-                            INNER JOIN enfermo AS en2 on en2.enfermoID = hz2.enfermoID
-                            INNER JOIN contactocontagio AS cc2 on cc2.enfermoID = hz2.enfermoID
+                            INNER JOIN Enfermo AS en2 on en2.enfermoID = hz2.enfermoID
+                            INNER JOIN ContactoContagio AS cc2 on cc2.enfermoID = hz2.enfermoID
                             WHERE hz2.hospitalID = hz.hospitalID 
                         ))*100
                     ,1)

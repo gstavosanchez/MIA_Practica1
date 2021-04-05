@@ -7,3 +7,6 @@ Content-Type: application/json
 {
     "filePath":"C:\\Users\\elmer\\Downloads\\test.csv"
 }
+
+###
+GET http://localhost:5000/api/hospital/cargarmodelo

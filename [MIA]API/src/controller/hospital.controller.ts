@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import fs from "fs-extra";
 import pool from "../database";
 import { ITemp } from "../models/temp.model";
+import { getListTables, getViewList } from "./db.controller";
 
 /* ================================== CARGA MASIVA ================================== */
 /**
@@ -221,6 +222,13 @@ export const deleteModel = async (req:Request,res:Response):Promise<Response> =>
  * @returns Devuelve un json con el resultado de la petición
  */
  export const loadModel = async (req:Request,res:Response):Promise<Response> => {
-  const result:any[] = await pool.query('d');
-  return res.status(200).json({msg:'Data deleted from temprary table'})
+  const tableList:string[] = getListTables();
+  const viewList:string[] = getViewList();
+  for(let tb of tableList){
+    const result:any[] = await pool.query(tb);
+  }
+  for(let vw of viewList){
+    const result:any[] = await pool.query(vw);
+  }
+  return res.status(200).json({msg:'The tables loaded'})
 }
