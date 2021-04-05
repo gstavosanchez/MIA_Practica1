@@ -40,7 +40,7 @@ AS
     GROUP BY hp.nombre
 ;
 /*  ====== ======================== CONSULTA NO.2 ======================== ======*/
-/* Mostrar el nombre, apellido de todas las víctimas en cuarentena que
+/* Mostrar el nombre, apellido de todAS lAS víctimAS en cuarentena que
     presentaron una efectividad mayor a 5 en el tratamiento “Transfusiones de
     sangre”. */
 CREATE VIEW view_consulta2
@@ -54,8 +54,8 @@ AS
     AND ten.efectividad > 5
 ;
 /*  ====== ======================== CONSULTA NO.3 ======================== ======*/
-/* Mostrar el nombre, apellido y dirección de las víctimas fallecidas con más de
-    tres personas asociadas. */
+/* Mostrar el nombre, apellido y dirección de lAS víctimAS fallecidAS con más de
+    tres personAS ASociadAS. */
 CREATE VIEW view_consulta3
 AS
     SELECT en.nombre AS Nombre,en.apellido AS Apellido, en.direccion AS Direccion,
@@ -68,8 +68,8 @@ AS
     GROUP BY cc.enfermoID
 ;
 /*  ====== ======================== CONSULTA NO.4 ======================== ======*/
-/* Mostrar el nombre y apellido de todas las víctimas en estado “SOSPECHA”
-    que tuvieron contacto físico de tipo “Beso” con más de 2 de sus asociados. */
+/* Mostrar el nombre y apellido de todAS lAS víctimAS en estado “SOSPECHA”
+    que tuvieron contacto físico de tipo “Beso” con más de 2 de sus Asociados. */
 CREATE VIEW view_consulta4
 AS
     SELECT en.nombre AS Nombre,en.apellido AS Apellido,en.estado AS Estado,cc.tipo AS Tipo_Contacto,
@@ -89,7 +89,7 @@ AS
     GROUP BY cc.enfermoID
 ;
 /*  ====== ======================== CONSULTA NO.5 ======================== ======*/
-/* Top 5 de víctimas que más tratamientos se han aplicado del tratamiento
+/* Top 5 de víctimAS que más tratamientos se han aplicado del tratamiento
     “Oxígeno”.
     NOTA: Depende de como se ordeno aparecen los datos para la calificacion*/
 CREATE VIEW view_consulta5
@@ -112,8 +112,8 @@ AS
     LIMIT 5
 ;
 /*  ====== ======================== CONSULTA NO.6 ======================== ======*/
-/*  Mostrar el nombre, el apellido y la fecha de fallecimiento de todas las
-    víctimas que se movieron por la dirección “1987 Delphine Well” a los cuales
+/*  Mostrar el nombre, el apellido y la fecha de fallecimiento de todAS lAS
+    víctimAS que se movieron por la dirección “1987 Delphine Well” a los cuales
     se les aplicó "Manejo de la presión arterial" como tratamiento.*/
 CREATE VIEW view_consulta6
 AS
@@ -127,7 +127,7 @@ AS
     AND lc.ubicacion LIKE '%1987 Delphine Well%'
 ;
 /*  ====== ======================== CONSULTA NO.7 ======================== ======*/
-/* Mostrar nombre, apellido y dirección de las víctimas que tienen menos de 2
+/* Mostrar nombre, apellido y dirección de lAS víctimAS que tienen menos de 2
     allegados los cuales hayan estado en un hospital y que se le hayan aplicado
     únicamente dos tratamientos. */
 CREATE VIEW view_consulta7
@@ -144,7 +144,7 @@ AS
 ;
 /*  ====== ======================== CONSULTA NO.8 ======================== ======*/
 /*  Mostrar el número de mes ,de la fecha de la primera sospecha, nombre y
-    apellido de las víctimas que más tratamientos se han aplicado y las que
+    apellido de lAS víctimAS que más tratamientos se han aplicado y lAS que
     menos. (Todo en una sola consulta). */
 CREATE VIEW view_consulta8
 AS
@@ -168,7 +168,7 @@ AS
     )B
 ;
 /*  ====== ======================== CONSULTA NO.9 ======================== ======*/
-/*  Mostrar el porcentaje de víctimas que le corresponden a cada hospital. */
+/*  Mostrar el porcentaje de víctimAS que le corresponden a cada hospital. */
 CREATE VIEW view_consulta9
 AS
     SELECT hp.nombre AS Hospital,(SELECT COUNT(enfermoID) FROM Hospitalizacion WHERE hospitalID = hz.hospitalID) 'Cantidad',
@@ -183,59 +183,39 @@ AS
 /*  ====== ======================== CONSULTA NO.10 ======================== ======*/
 /*  Mostrar el porcentaje del contacto físico más común de cada hospital de la
     siguiente manera: nombre de hospital, nombre del contacto físico, porcentaje
-    de víctimas. */
+    de víctimAS. */
 CREATE VIEW view_consulta10
 AS
-    SELECT hp.nombre AS Hospital,cc.tipo AS Tipo_Contacto,
-    (ROUND(((SELECT COUNT(cc1.tipo)
-                FROM Hospitalizacion as hz1
-                inner join enfermo as en1 on en1.enfermoID = hz1.enfermoID
-                inner join contactocontagio as cc1 on cc1.enfermoID = hz1.enfermoID
+    SELECT Hospital,Tipo_Contacto,Cantidad,Porcentaje FROM (
+        SELECT hp.nombre AS Hospital,cc.tipo AS Tipo_Contacto,
+        (
+            SELECT COUNT(cc1.tipo) FROM Hospitalizacion AS hz1
+                INNER JOIN enfermo AS en1 on en1.enfermoID = hz1.enfermoID
+                INNER JOIN contactocontagio AS cc1 on cc1.enfermoID = hz1.enfermoID
                 WHERE hz1.hospitalID = hz.hospitalID
-                and cc1.tipo = cc.tipo )/
-            (SELECT COUNT(cc2.tipo)
-                FROM Hospitalizacion as hz2
-                inner join enfermo as en2 on en2.enfermoID = hz2.enfermoID
-                inner join contactocontagio as cc2 on cc2.enfermoID = hz2.enfermoID
-                WHERE hz2.hospitalID = hz.hospitalID ))*100,2)) 'Porcentaje'
-    FROM Hospital AS hp
-    INNER JOIN Hospitalizacion AS hz ON hz.hospitalID = hp.hospitalID
-    INNER JOIN Enfermo AS en ON en.enfermoID = hz.enfermoID
-    INNER JOIN ContactoContagio AS cc ON cc.enfermoID = hz.enfermoID
-    GROUP BY hp.hospitalID,cc.tipo
+                and cc1.tipo = cc.tipo
+        )Cantidad,
+        (CONCAT(
+                ROUND((
+                        (SELECT COUNT(cc1.tipo) FROM Hospitalizacion AS hz1
+                            INNER JOIN enfermo AS en1 on en1.enfermoID = hz1.enfermoID
+                            INNER JOIN contactocontagio AS cc1 on cc1.enfermoID = hz1.enfermoID
+                            WHERE hz1.hospitalID = hz.hospitalID
+                            and cc1.tipo = cc.tipo 
+                        )/
+                        (SELECT COUNT(cc2.tipo) FROM Hospitalizacion AS hz2
+                            INNER JOIN enfermo AS en2 on en2.enfermoID = hz2.enfermoID
+                            INNER JOIN contactocontagio AS cc2 on cc2.enfermoID = hz2.enfermoID
+                            WHERE hz2.hospitalID = hz.hospitalID 
+                        ))*100
+                    ,1)
+            ,' %')
+        ) Porcentaje
+        FROM Hospital AS hp
+        INNER JOIN Hospitalizacion AS hz ON hz.hospitalID = hp.hospitalID
+        INNER JOIN Enfermo AS en ON en.enfermoID = hz.enfermoID
+        INNER JOIN ContactoContagio AS cc ON cc.enfermoID = hz.enfermoID
+        GROUP BY hp.hospitalID,cc.tipo
+        ORDER BY Cantidad DESC
+    ) AS A GROUP BY Hospital
 ;
-
-
-
-
-/*  ====== ======================== EXTRA ======================== ======*/
-
-SELECT hp.hospitalID,hp.nombre AS Hospital,en.enfermoID,en.nombre AS Enfermo, cc.tipo AS Tipo_Contacto
-FROM Hospital AS hp
-INNER JOIN Hospitalizacion AS hz ON hz.hospitalID = hp.hospitalID
-INNER JOIN Enfermo AS en ON en.enfermoID = hz.enfermoID
-INNER JOIN ContactoContagio AS cc ON cc.enfermoID = hz.enfermoID
-ORDER BY hp.hospitalID
-
-
-SELECT COUNT(tipo) FROM ContactoContagio WHERE enfermoID = 6
-SELECT COUNT(hospitalID) FROM Hospitalizacion WHERE hospitalID = 2
-
-
-SELECT COUNT(tipo) FROM ContactoContagio WHERE enfermoID = 59     
-SELECT COUNT(cc2.tipo)
-FROM Hospitalizacion as hz2
-inner join enfermo as en2 on en2.enfermoID = hz2.enfermoID
-inner join contactocontagio as cc2 on cc2.enfermoID = hz2.enfermoID
-WHERE hz2.hospitalID = 2
-
-SELECT cc0.tipo
-FROM Hospitalizacion as hz0
-inner join enfermo as en0 on en0.enfermoID = hz0.enfermoID
-inner join contactocontagio as cc0 on cc0.enfermoID = hz0.enfermoID
-WHERE hz0.hospitalID = 15
-GROUP BY cc0.tipo 
-ORDER BY (count(cc1.tipo) ) desc
-LIMIT 1
-
-
