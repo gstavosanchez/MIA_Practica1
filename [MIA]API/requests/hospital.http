@@ -5,8 +5,31 @@ POST http://localhost:5000/api/hospital/cargartemporal
 Content-Type: application/json
 
 {
-    "filePath":"C:\\Users\\elmer\\Downloads\\test.csv"
+    "filePath":"/home/gustavo/Descargas/GRAND_VIRUS_EPICENTER.csv"
 }
-
 ###
 GET http://localhost:5000/api/hospital/cargarmodelo
+
+###
+GET http://localhost:5000/api/hospital/consulta1
+
+###
+GET http://localhost:5000/api/hospital/consulta2
+
+###
+GET http://localhost:5000/api/hospital/consulta3
+
+###
+GET http://localhost:5000/api/hospital/consulta4
+###
+GET http://localhost:5000/api/hospital/consulta5
+###
+GET http://localhost:5000/api/hospital/consulta6
+###
+GET http://localhost:5000/api/hospital/consulta7
+###
+GET http://localhost:5000/api/hospital/consulta8
+###
+GET http://localhost:5000/api/hospital/consulta9
+###
+GET http://localhost:5000/api/hospital/consulta10

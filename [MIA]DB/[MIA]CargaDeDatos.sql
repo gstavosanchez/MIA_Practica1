@@ -9,7 +9,7 @@ CREATE PROCEDURE sp_insert_hospital(
     BEGIN
         DECLARE searchID INT DEFAULT 0;
         IF (_nombre != '') THEN
-            SET searchID = (SELECT hospitalID FROM HOSPITAL WHERE
+            SET searchID = (SELECT hospitalID FROM Hospital WHERE
                              nombre LIKE CONCAT('%',_nombre,'%') AND direccion LIKE CONCAT('%',_ubicacion,'%'));
         ELSE
             SET searchID = 1;
@@ -38,8 +38,13 @@ CREATE PROCEDURE sp_insert_enfermo(
                          apellido LIKE CONCAT('%',_apellido_victima,'%') AND direccion LIKE CONCAT('%',_direccion_victima,'%')
                          AND estado LIKE CONCAT('%',_estado_victima,'%') );
         IF (searchID <=> 0 OR searchID is NULL) THEN
-            INSERT INTO Enfermo(nombre,apellido,direccion,estado,fechaSospecha,fechaConfirmacion,fechaMuerte) 
-            VALUES (_nombre_victima,_apellido_victima,_direccion_victima,_estado_victima,_fecha_primer_sopecha,_fecha_confirmacion,_fecha_muerte);
+            IF (_fecha_muerte != '')THEN
+                INSERT INTO Enfermo(nombre,apellido,direccion,estado,fechaSospecha,fechaConfirmacion,fechaMuerte)
+                VALUES (_nombre_victima,_apellido_victima,_direccion_victima,_estado_victima,CAST(_fecha_primer_sopecha AS DATETIME),CAST(_fecha_confirmacion AS DATETIME),CAST(_fecha_muerte AS DATETIME));
+            ELSE
+                INSERT INTO Enfermo(nombre,apellido,direccion,estado,fechaSospecha,fechaConfirmacion,fechaMuerte)
+                VALUES (_nombre_victima,_apellido_victima,_direccion_victima,_estado_victima,CAST(_fecha_primer_sopecha AS DATETIME),CAST(_fecha_confirmacion AS DATETIME),CAST('0000-00-00 00:00:00' AS DATETIME));   
+            END IF;
         END IF;
     END$$
 DELIMITER ;
@@ -72,7 +77,7 @@ CREATE PROCEDURE sp_insert_tratamiento_efermo(
     _ubicacion_hospital VARCHAR(100),
     _nombre_tratamiento VARCHAR(100),
     _efectividad_tratamiento VARCHAR(100),
-    _efectividad_victima INT,
+    _efectividad_victima VARCHAR(100),
     _fecha_incio_tratamiento VARCHAR(100),
     _fecha_fin_tratamiento VARCHAR(100)
 
@@ -85,7 +90,7 @@ CREATE PROCEDURE sp_insert_tratamiento_efermo(
         IF (_nombre_victima != '' AND _nombre_hospital != '' AND _nombre_tratamiento != '') THEN
             SET _enfermoID = (SELECT enfermoID FROM Enfermo WHERE nombre LIKE CONCAT('%',_nombre_victima,'%') AND 
                                 apellido LIKE CONCAT('%',_apellido_victima,'%') AND direccion LIKE CONCAT('%',_direccion_victima,'%'));
-            SET _hospitalID = (SELECT hospitalID FROM HOSPITAL WHERE
+            SET _hospitalID = (SELECT hospitalID FROM Hospital WHERE
                                  nombre LIKE CONCAT('%',_nombre_hospital,'%') AND direccion LIKE CONCAT('%',_ubicacion_hospital,'%'));
             SET _tratamientoID = (SELECT tratamientoID FROM Tratamiento WHERE nombre
                                     LIKE CONCAT('%',_nombre_tratamiento,'%') AND efectividad LIKE CONCAT('%',_efectividad_tratamiento,'%'));
@@ -95,7 +100,7 @@ CREATE PROCEDURE sp_insert_tratamiento_efermo(
             IF (_enfermoID != 0 AND _hospitalID != 0 AND _tratamientoID != 0) THEN
                 IF (searchID <=> 0 OR searchID IS NULL) THEN
                     INSERT INTO TratamientoEnfermo(efectividad,fechaInicio,fechaFin,tratamientoID,enfermoID,hospitalID)
-                    VALUES (_efectividad_victima,_fecha_incio_tratamiento,_fecha_fin_tratamiento,_tratamientoID,_enfermoID,_hospitalID);
+                    VALUES (_efectividad_victima * 1,CAST(_fecha_incio_tratamiento AS DATETIME),CAST(_fecha_fin_tratamiento AS DATETIME),_tratamientoID,_enfermoID,_hospitalID); 
                 END IF;
             END IF;
         END IF;
@@ -123,7 +128,7 @@ CREATE PROCEDURE sp_lugar_contacto(
             IF (_enfermoID != 0) THEN
                 IF (searchID <=> 0 OR searchID IS NULL) THEN
                     INSERT INTO LugarContagio(ubicacion,fechaLLegada,fechaSalida,enfermoID)
-                    VALUES (_ubicacion,_fecha_llegada,_fecha_retiro,_enfermoID);
+                    VALUES (_ubicacion,CAST(_fecha_llegada AS DATETIME),CAST(_fecha_retiro AS DATETIME) ,_enfermoID);
                 END IF;
             END IF;
         END IF;
@@ -172,7 +177,7 @@ CREATE PROCEDURE sp_insert_detalle_asociado(
                             fechaConocio LIKE CONCAT('%',_fecha_conocio,'%'));
             IF (_enfermoID != 0 AND _asociadoID != 0) THEN
                 IF (searchID <=> 0 OR searchID IS NULL) THEN
-                    INSERT INTO DetalleAsociado(enfermoID,asociadoID,fechaConocio) VALUES (_enfermoID,_asociadoID,_fecha_conocio);
+                    INSERT INTO DetalleAsociado(enfermoID,asociadoID,fechaConocio) VALUES (_enfermoID,_asociadoID,CAST(_fecha_conocio AS DATETIME));
                 END IF;
             END IF;
         END IF;
@@ -207,7 +212,7 @@ CREATE PROCEDURE sp_insert_contacto_contagio(
             IF (_enfermoID != 0 AND _asociadoID != 0) THEN
                 IF (searchID <=> 0 OR searchID IS NULL) THEN
                     INSERT INTO ContactoContagio(tipo,fechaContacto,fechaFinContacto,asociadoID,enfermoID)
-                    VALUES (_tipo,_fecha_contacto,_fecha_fin_contacto,_asociadoID,_enfermoID); 
+                    VALUES (_tipo,CAST(_fecha_contacto AS DATETIME),CAST(_fecha_fin_contacto AS DATETIME),_asociadoID,_enfermoID);
                 END IF;
             END IF;
         END IF;
@@ -229,7 +234,7 @@ CREATE PROCEDURE sp_insert_hospitalizacion(
         IF (_nombre_victima != '' AND _nombre_hospital != '') THEN
             SET _enfermoID = (SELECT enfermoID FROM Enfermo WHERE nombre LIKE CONCAT('%',_nombre_victima,'%') AND 
                                 apellido LIKE CONCAT('%',_apellido_victima,'%') AND direccion LIKE CONCAT('%',_direccion_victima,'%'));
-            SET _hospitalID = (SELECT hospitalID FROM HOSPITAL WHERE
+            SET _hospitalID = (SELECT hospitalID FROM Hospital WHERE
                                 nombre LIKE CONCAT('%',_nombre_hospital,'%') AND direccion LIKE CONCAT('%',_ubicacion_hospital,'%'));
             SET searchID = (SELECT hospitalizacionID FROM Hospitalizacion WHERE
                                 hospitalID = _hospitalID AND enfermoID = _enfermoID);

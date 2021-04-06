@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import fs from "fs-extra";
 import pool from "../database";
 import { ITemp } from "../models/temp.model";
-import { getListTables, getViewList } from "./db.controller";
+import { getListTables, getProceduresList, getViewList } from "./db.controller";
 
 /* ================================== CARGA MASIVA ================================== */
 /**
@@ -18,7 +18,8 @@ export const loadFiles = async (
   // enf -> shortcut para empresiones lambada
   const filePath: string = req.body.filePath;
   const data = await fs.readFile(filePath, "utf-8");
-  let splitData: string[] = data.split("\r\n");
+  console.log(filePath);
+  let splitData: string[] = data.split("\n");
   let index:number = 0;
   for (let value of splitData ) {
     if (index > 0 && value != '' && value != null) {
@@ -118,7 +119,7 @@ export const getQuery3 = async (req:Request,res:Response):Promise<Response> => {
 export const getQuery4 = async(req:Request,res:Response):Promise<Response> => {
   const result:any[] = await pool.query('SELECT * FROM view_consulta4');
   if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
-  return res.status(200).json({consulta3:result})
+  return res.status(200).json({consulta4:result})
 }
 /* ================================== GET CONSULTA NO.5 ================================== */
 /**
@@ -130,7 +131,7 @@ export const getQuery4 = async(req:Request,res:Response):Promise<Response> => {
 export const getQuery5 = async (req:Request,res:Response):Promise<Response> => {
   const result:any[] = await pool.query('SELECT * FROM view_consulta5');
   if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
-  return res.status(200).json({consulta3:result})
+  return res.status(200).json({consulta5:result})
 }
 /* ================================== GET CONSULTA NO.6 ================================== */
 /**
@@ -142,7 +143,7 @@ export const getQuery5 = async (req:Request,res:Response):Promise<Response> => {
 export const getQuery6 = async (req:Request,res:Response):Promise<Response> => {
   const result:any[] = await pool.query('SELECT * FROM view_consulta6');
   if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
-  return res.status(200).json({consulta3:result})
+  return res.status(200).json({consulta6:result})
 }
 /* ================================== GET CONSULTA NO.7 ================================== */
 /**
@@ -154,7 +155,7 @@ export const getQuery6 = async (req:Request,res:Response):Promise<Response> => {
  export const getQuery7 = async (req:Request,res:Response):Promise<Response> => {
   const result:any[] = await pool.query('SELECT * FROM view_consulta7');
   if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
-  return res.status(200).json({consulta3:result})
+  return res.status(200).json({consulta7:result})
 }
 /* ================================== GET CONSULTA NO.8 ================================== */
 /**
@@ -166,7 +167,7 @@ export const getQuery6 = async (req:Request,res:Response):Promise<Response> => {
  export const getQuery8 = async (req:Request,res:Response):Promise<Response> => {
   const result:any[] = await pool.query('SELECT * FROM view_consulta8');
   if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
-  return res.status(200).json({consulta3:result})
+  return res.status(200).json({consulta8:result})
 }
 /* ================================== GET CONSULTA NO.9 ================================== */
 /**
@@ -178,7 +179,7 @@ export const getQuery6 = async (req:Request,res:Response):Promise<Response> => {
  export const getQuery9 = async (req:Request,res:Response):Promise<Response> => {
   const result:any[] = await pool.query('SELECT * FROM view_consulta9');
   if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
-  return res.status(200).json({consulta3:result})
+  return res.status(200).json({consulta9:result})
 }
 /* ================================== GET CONSULTA NO.10 ================================== */
 /**
@@ -190,7 +191,7 @@ export const getQuery6 = async (req:Request,res:Response):Promise<Response> => {
 export const getQuery10 = async (req:Request,res:Response):Promise<Response> => {
   const result:any[] = await pool.query('SELECT * FROM view_consulta10');
   if(result.length == 0) return res.status(404).json({msg:`The isn't data in the query`});
-  return res.status(200).json({consulta3:result})
+  return res.status(200).json({consulta10:result})
 }
 /* ================================== GET ELIMINAR TEMPORAL ================================== */
 /**
@@ -224,11 +225,26 @@ export const deleteModel = async (req:Request,res:Response):Promise<Response> =>
  export const loadModel = async (req:Request,res:Response):Promise<Response> => {
   const tableList:string[] = getListTables();
   const viewList:string[] = getViewList();
+  const procedureList:string[] = getProceduresList();
+  let index:number = 0;
   for(let tb of tableList){
     const result:any[] = await pool.query(tb);
+    console.log(`Table:${index +1}`);
+    index ++;
   }
+  index =0;
   for(let vw of viewList){
     const result:any[] = await pool.query(vw);
+    console.log(`View:${index +1}`);
+    index++;
   }
+  index =0;
+  for (let procedure of procedureList){
+    const result:any[] = await pool.query(procedure);
+    console.log(`Procedure:${index +1}`);
+    index++;
+  }
+  index = 0;
+
   return res.status(200).json({msg:'The tables loaded'})
 }
